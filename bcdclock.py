@@ -124,8 +124,36 @@ index in the fontlist."""
 	return (font, ofont)
 
 
+def setFullscreen(window, fullscreen):
+	"""Sets the window to fullscreen or windowed mode depending on the boolean
+'fullscreen' flag and returns the new window dimensions as a tuple."""
+	if fullscreen:
+		# hide the cursor
+		sdl2.SDL_ShowCursor(sdl2.SDL_DISABLE)
+		# set the window to fullscreen mode and get its new dimensions
+		sdl2.SDL_SetWindowFullscreen(window, sdl2.SDL_WINDOW_FULLSCREEN_DESKTOP)
+		w = ctypes.c_int()
+		h = ctypes.c_int()
+		sdl2.SDL_GetWindowSize(window, w, h)
+		width = w.value
+		height = h.value
+	else:
+		# show the cursor
+		sdl2.SDL_ShowCursor(sdl2.SDL_ENABLE)
+		# set the window to windowed mode and go back to the original dimensions
+		sdl2.SDL_SetWindowFullscreen(window, 0)
+		width = origwidth
+		height = origheight
+
+	# return the new dimensions
+	return (width, height)
+
+
 def run():
 	"""The main program loop."""
+
+	# mark these as global variables
+	global width, height, origwidth, origheight
 
 	# load fonts from the "fonts" folder
 	fontlist = []
@@ -157,6 +185,13 @@ def run():
 
 	# pick a random color for the foreground (panels)
 	fgcolor = randomColor()
+
+	# preserve original window dimensions
+	origwidth = width
+	origheight = height
+
+	# start in windowed mode
+	fullscreen = False
 
 	# start the main processing loop which repeats until the program is exited
 	running = True
@@ -201,9 +236,10 @@ def run():
 				# 'l' toggles between the local timezone and GMT
 				if event.key.keysym.sym == sdl2.SDLK_l:
 					modelocal = not modelocal
-				# 'f' toggles fullscreen mode (not yet implemented)
+				# 'f' toggles fullscreen/windowed mode
 				if event.key.keysym.sym == sdl2.SDLK_f:
-					pass
+					fullscreen = not fullscreen
+					(width, height) = setFullscreen(window, fullscreen)
 				# 't' selects the next available font for the clock text
 				if event.key.keysym.sym == sdl2.SDLK_t:
 					fontindex += 1
