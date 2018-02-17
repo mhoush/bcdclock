@@ -15,3 +15,4 @@ Space | Changes panel color (random)
 h | Toggles between 24- and 12-hour mode
 l | Toggles between local timezone and GMT
 t | Cycles through available fonts
+f | Toggles between fullscreen and windowed mode
